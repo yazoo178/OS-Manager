@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="flood.YoutubeVideoDownloader"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:flood"
+        xmlns:yt="clr-namespace:flood.Downloading.Youtube"
+        xmlns:VideoInfo="clr-namespace:YoutubeExtractor;assembly=YoutubeExtractor"
+        xmlns:downloader="clr-namespace:flood.Downloading" Background="Black">
+      
+    
+    <UserControl.DataContext>
+        <local:YoutubeDownloaderViewModel>
+            <local:YoutubeDownloaderViewModel.Downloader>
+                <yt:YoutubeVideoDownload></yt:YoutubeVideoDownload>
+            </local:YoutubeDownloaderViewModel.Downloader>
+        </local:YoutubeDownloaderViewModel>
+    </UserControl.DataContext>
+    
+    <UserControl.Style>
+        <Style TargetType="local:YoutubeVideoDownloader">
+            <Setter Property="local:YoutubeVideoDownloader.Downloader">
+                <Setter.Value>
+                    <Binding Path="Downloader" Mode="TwoWay"></Binding>
+                </Setter.Value>
+                
+            </Setter>
+        </Style>
+    </UserControl.Style>
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/flood;component/Themes/Metro/Metro.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="/flood;component/Themes/Metro/Metro.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Border Background="White">
+        
+    <Grid>
+            <Grid.CommandBindings>
+                <CommandBinding Command="{x:Static local:Commands.DownloadYouTubeVideoCommand}" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed"></CommandBinding>
+            </Grid.CommandBindings>
+        
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <DockPanel>
+                <Label Content="URL:" Width="{Binding ElementName=longestLabel, Path=ActualWidth}"></Label>
+                <TextBox x:Name="url" Text="{Binding Url, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" ></TextBox>  
+            </DockPanel>
+
+            <DockPanel Grid.Row="1">
+                <Label Content="Output Folder:" x:Name="longestLabel"></Label>
+                <TextBox x:Name="outputFolder">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxStyle}">
+                            <Setter Property="Text" Value="{Binding OutputFolder, UpdateSourceTrigger=PropertyChanged}"></Setter>                                    
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+            </DockPanel>
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="4">
+                <RadioButton Margin="4" IsChecked="{Binding Path=All, Mode=TwoWay}">All</RadioButton>
+                <RadioButton Margin="4" IsChecked="{Binding Path=VideoOnly, Mode=TwoWay}">Video Only</RadioButton>
+                <RadioButton Margin="4" IsChecked="{Binding Path=AudioOnly, Mode=TwoWay}">Audio Only</RadioButton>
+            </StackPanel>
+            <local:BaseDataGrid ItemsSourceUpdated="grid_ItemsSourceUpdated" x:Name="youtubeGrid" ItemsSource="{Binding VideoTypeView}" EntityType="{x:Type VideoInfo:VideoInfo}" Grid.Row="3" IsSynchronizedWithCurrentItem="True" CanUserResizeColumns="True">
+                <local:BaseDataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Width" Value="{Binding}"></Setter>
+                    </Style>
+                </local:BaseDataGrid.ColumnHeaderStyle>
+                
+                <local:BaseDataGrid.ItemContainerStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding VideoType}" Value="Unknown">
+                                <DataTrigger.Setters>
+                                    <Setter Property="IsEnabled" Value="False"></Setter>
+                                </DataTrigger.Setters>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </local:BaseDataGrid.ItemContainerStyle>
+                
+            </local:BaseDataGrid>
+        
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource ButtonStyle}"  Command="{Binding Download}" CommandParameter="{Binding ElementName=ProgressDownloader, Path=ProgressService}">Download!</Button>
+                <Button Style="{StaticResource ButtonStyle}" Command="{Binding PlayLastVideo}" Grid.Column="1">Play Downloaded Video!</Button>
+            </Grid>
+
+            <local:ProgressWindow x:Name="ProgressDownloader" VerticalAlignment="Bottom" Grid.Row="5" CancelButtonVisibility="Collapsed" UseMultiBar="false"  Content="Stop Download">
+                <local:ProgressWindow.ProgressService>
+                    <local:DefaultNotifyingService></local:DefaultNotifyingService>
+                </local:ProgressWindow.ProgressService>
+            </local:ProgressWindow>
+
+        </Grid>
+    </Border>
+</UserControl>

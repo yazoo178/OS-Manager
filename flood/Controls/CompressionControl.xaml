@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="flood.CompressionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:flood"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type local:CompressionControl}">
+            <Style.Resources>
+                <local:CompressionViewModel x:Key="compModel">
+                    <local:CompressionViewModel.CompressionFactory>
+                        <local:CompressionFactory></local:CompressionFactory>
+                    </local:CompressionViewModel.CompressionFactory>
+                </local:CompressionViewModel>
+                
+            </Style.Resources>
+            <Setter Property="DataContext" Value="{StaticResource compModel}"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:CompressionControl}">
+                        <Border Background="White">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <ContentPresenter Content="{TemplateBinding Content}" DataContext="{TemplateBinding DataContext}"></ContentPresenter>
+                                <ComboBox x:Name="PART_box" Grid.Row="1" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DefaultCompressionTypes, Mode=OneTime}" SelectedItem="{Binding Mode=OneWayToSource, Path=CompressionCreatorString}"></ComboBox>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                    
+                </Setter.Value>
+            </Setter>
+            <Setter Property="SelectedCompression" Value="{Binding Mode=OneWay, Path=CurrentCompression}"></Setter>
+            <Setter Property="UseDefaultCompressionSelections" Value="False"></Setter>
+            <Setter Property="CompressionTypes" Value="Zip"></Setter>
+        </Style>
+    </UserControl.Resources>
+</UserControl>
